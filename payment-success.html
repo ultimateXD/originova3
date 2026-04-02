@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Success - ORIGINOVA</title>
+    <script src="auth.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="booking-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .success-page {
+            background: var(--dark-bg);
+            min-height: 100vh;
+        }
+
+        .success-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 140px 40px 80px;
+            text-align: center;
+        }
+
+        .success-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 60px 40px;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            margin: 0 auto 32px;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .success-title {
+            font-family: var(--font-heading);
+            font-size: 36px;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .success-message {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .success-message-ar {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+
+        .booking-number-section {
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--primary-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+
+        .booking-number-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .booking-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+
+        .qr-code-section {
+            margin: 40px 0;
+        }
+
+        .qr-code-label {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .qr-code-container {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            display: inline-block;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .qr-code-container canvas {
+            display: block;
+        }
+
+        .booking-details {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .booking-details-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .success-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-download {
+            padding: 14px 32px;
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-download:hover {
+            background: var(--primary-color);
+            color: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .success-container {
+                padding: 120px 20px 60px;
+            }
+
+            .success-card {
+                padding: 40px 24px;
+            }
+
+            .success-title {
+                font-size: 28px;
+            }
+
+            .booking-number {
+                font-size: 24px;
+            }
+
+            .success-actions {
+                flex-direction: column;
+            }
+
+            .btn-download,
+            .btn-primary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="success-page">
+    <!-- Navigation -->
+    <nav class="navbar booking-navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="home.html" class="logo">
+                    <img src="logo.webp" class="logo-icon" alt="logo">
+                    <span class="logo-text">ORIGINOVA</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Success Content -->
+    <div class="success-container">
+        <div class="success-card">
+            <div class="success-icon">✓</div>
+            <h1 class="success-title">Payment Successful!</h1>
+            <p class="success-message-ar">شكراً لثقتك في Originova. تم استلام مدفوعاتك بنجاح.</p>
+            <p class="success-message">Thank you for choosing ORIGINOVA. Your payment has been received successfully and your booking is confirmed.</p>
+
+            <div class="booking-number-section">
+                <div class="booking-number-label">Booking Reference Number</div>
+                <div class="booking-number" id="bookingNumber">Loading...</div>
+            </div>
+
+            <div class="qr-code-section">
+                <div class="qr-code-label">Scan this QR code for booking details</div>
+                <div class="qr-code-container">
+                    <canvas id="qrcode"></canvas>
+                </div>
+            </div>
+
+            <div class="booking-details" id="bookingDetails">
+                <div class="booking-details-title">Booking Summary</div>
+                <!-- Details will be inserted here -->
+            </div>
+
+            <div class="success-actions">
+                <button class="btn-download" onclick="downloadConfirmation()">Download Confirmation</button>
+                <a href="home.html" class="btn-primary">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="payment-utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const bookingData = getBookingData();
+
+            if (!bookingData) {
+                window.location.href = 'home.html';
+                return;
+            }
+
+            // Generate or restore a stable booking number for this booking
+            const bookingNumber = getOrCreateBookingNumber();
+            document.getElementById('bookingNumber').textContent = bookingNumber;
+
+            // Generate QR code
+            generateQRCode(bookingNumber, bookingData);
+
+            // Render booking details
+            renderBookingDetails(bookingData, bookingNumber);
+
+            // Clear booking data after displaying
+            // Keep it for download functionality
+        });
+
+        function getOrCreateBookingNumber() {
+            const existing = sessionStorage.getItem('originova_booking_number');
+            if (existing) return existing;
+
+            const generated = generateBookingNumber();
+            sessionStorage.setItem('originova_booking_number', generated);
+            return generated;
+        }
+
+        function generateQRCode(bookingNumber, bookingData) {
+            const qrData = {
+                bookingNumber: bookingNumber,
+                name: bookingData.name,
+                type: bookingData.type,
+                amount: bookingData.amount,
+                date: new Date().toISOString()
+            };
+
+            const canvas = document.getElementById('qrcode');
+            const qrPayload = JSON.stringify(qrData);
+
+            if (typeof QRCode !== 'undefined' && canvas) {
+                QRCode.toCanvas(canvas, qrPayload, {
+                    width: 200,
+                    margin: 2,
+                    color: {
+                        dark: '#1a1a2e',
+                        light: '#ffffff'
+                    }
+                }, function (error) {
+                    if (error) console.error(error);
+                });
+                return;
+            }
+
+            const container = document.querySelector('.qr-code-container');
+            if (container) {
+                const img = document.createElement('img');
+                img.alt = 'Booking QR code';
+                img.width = 200;
+                img.height = 200;
+                img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrPayload)}`;
+                container.innerHTML = '';
+                container.appendChild(img);
+            }
+        }
+
+        function renderBookingDetails(booking, bookingNumber) {
+            const detailsDiv = document.getElementById('bookingDetails');
+            let detailsHTML = '<div class="booking-details-title">Booking Summary</div>';
+
+            detailsHTML += `
+                <div class="detail-row">
+                    <span class="detail-label">Booking Number</span>
+                    <span class="detail-value">${bookingNumber}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Booking Type</span>
+                    <span class="detail-value">${booking.type.charAt(0).toUpperCase() + booking.type.slice(1)}</span>
+                </div>
+            `;
+
+            if (booking.type === 'flight') {
+                detailsHTML += `
+                    <div class="detail-row">
+                        <span class="detail-label">Flight</span>
+                        <span class="detail-value">${booking.name}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Route</span>
+                        <span class="detail-value">${booking.from} → ${booking.to}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Departure</span>
+                        <span class="detail-value">${new Date(booking.departureDate).toLocaleDateString()} at ${booking.departureTime}</span>
+                    </div>
+                    ${booking.returnDate ? `
+                    <div class="detail-row">
+                        <span class="detail-label">Return</span>
+                        <span class="detail-value">${new Date(booking.returnDate).toLocaleDateString()}</span>
+                    </div>
+                    ` : ''}
+                    <div class="detail-row">
+                        <span class="detail-label">Cabin Class</span>
+                        <span class="detail-value">${booking.cabinClass}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Travellers</span>
+                        <span class="detail-value">${booking.travellers}</span>
+                    </div>
+                `;
+            } else if (booking.type === 'offer' || booking.type === 'package') {
+                detailsHTML += `
+                    <div class="detail-row">
+                        <span class="detail-label">Package</span>
+                        <span class="detail-value">${booking.name}</span>
+                    </div>
+                    ${booking.duration ? `
+                    <div class="detail-row">
+                        <span class="detail-label">Duration</span>
+                        <span class="detail-value">${booking.duration}</span>
+                    </div>
+                    ` : ''}
+                `;
+            } else if (booking.type === 'service') {
+                detailsHTML += `
+                    <div class="detail-row">
+                        <span class="detail-label">Service</span>
+                        <span class="detail-value">${booking.name}</span>
+                    </div>
+                `;
+
+                if (booking.details) {
+                    Object.entries(booking.details).forEach(([key, value]) => {
+                        if (value && key !== 'requirements') {
+                            const label = key
+                                .replace(/([A-Z])/g, ' $1')
+                                .replace(/^./, char => char.toUpperCase());
+                            detailsHTML += `
+                                <div class="detail-row">
+                                    <span class="detail-label">${label}</span>
+                                    <span class="detail-value">${value}</span>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+            }
+
+            detailsHTML += `
+                <div class="detail-row" style="border-top: 2px solid var(--primary-color); margin-top: 16px; padding-top: 16px;">
+                    <span class="detail-label" style="font-size: 16px; font-weight: 600; color: var(--text-primary);">Total Paid</span>
+                    <span class="detail-value" style="font-size: 20px; font-weight: 700; color: var(--primary-color);">$${booking.amount.toLocaleString()}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Payment Date</span>
+                    <span class="detail-value">${new Date().toLocaleDateString()}</span>
+                </div>
+            `;
+
+            detailsDiv.innerHTML = detailsHTML;
+        }
+
+        function downloadConfirmation() {
+            const bookingData = getBookingData();
+            const bookingNumber = document.getElementById('bookingNumber').textContent;
+
+            // Create a simple text confirmation
+            let confirmationText = `
+ORIGINOVA - Booking Confirmation
+================================
+
+Booking Number: ${bookingNumber}
+Booking Type: ${bookingData.type.toUpperCase()}
+Name: ${bookingData.name}
+Amount Paid: $${bookingData.amount.toLocaleString()}
+Payment Date: ${new Date().toLocaleDateString()}
+
+`;
+
+            if (bookingData.type === 'flight') {
+                confirmationText += `
+Flight Details:
+- Route: ${bookingData.from} → ${bookingData.to}
+- Departure: ${new Date(bookingData.departureDate).toLocaleDateString()} at ${bookingData.departureTime}
+- Cabin Class: ${bookingData.cabinClass}
+- Travellers: ${bookingData.travellers}
+`;
+            } else if (bookingData.type === 'offer' || bookingData.type === 'package') {
+                confirmationText += `
+Package Details:
+- Package: ${bookingData.name}
+${bookingData.duration ? `- Duration: ${bookingData.duration}
+` : ''}`;
+            } else if (bookingData.type === 'service' && bookingData.details) {
+                confirmationText += `
+Service Details:
+`;
+                Object.entries(bookingData.details).forEach(([key, value]) => {
+                    if (value && key !== 'requirements') {
+                        const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, char => char.toUpperCase());
+                        confirmationText += `- ${label}: ${value}
+`;
+                    }
+                });
+            }
+
+            confirmationText += `
+Thank you for choosing ORIGINOVA!
+For inquiries, please contact us with your booking number.
+
+شكراً لثقتك في Originova
+`;
+
+            // Create download
+            const blob = new Blob([confirmationText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ORIGINOVA-Booking-${bookingNumber}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            showNotification('Confirmation downloaded successfully!', 'success');
+        }
+    </script>
+</body>
+</html>

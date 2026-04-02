@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Booking - ORIGINOVA</title>
+    <script src="auth.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="booking-styles.css?v=3">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="booking-page">
+    <!-- Navigation -->
+    <nav class="navbar booking-navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="home.html" class="logo">
+                    <img src="logo.webp" class="logo-icon" alt="logo">
+                    <span class="logo-text">ORIGINOVA</span>
+                </a>
+                <a href="home.html" class="btn-secondary btn-back">Back to Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Booking Hero Section -->
+    <section class="booking-hero">
+        <div class="container">
+            <div class="booking-hero-content">
+                <span class="booking-subtitle">Premium Flight Booking</span>
+                <h1 class="booking-title">Book Your <span class="gradient-text">Perfect Flight</span></h1>
+                <p class="booking-description">Search and compare flights from top airlines. Find the best deals for your journey with our premium booking experience.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Flight Booking Form Section -->
+    <section class="booking-form-section">
+        <div class="container">
+            <div class="booking-form-wrapper">
+                <h2 class="form-section-title">Search Flights</h2>
+                <p class="form-section-subtitle">Enter your travel details to find available flights</p>
+
+                <form id="flightSearchForm" class="flight-search-form">
+                    <!-- Trip Type Tabs -->
+                    <div class="trip-type-tabs">
+                        <button type="button" class="trip-type-tab active" data-trip="oneway">One Way</button>
+                        <button type="button" class="trip-type-tab" data-trip="roundtrip">Round Trip</button>
+                        <button type="button" class="trip-type-tab" data-trip="multicity">Multi City</button>
+                    </div>
+
+                    <!-- Flight Form Fields -->
+                    <div class="booking-form-grid">
+                        <!-- Origin & Destination Group -->
+                        <div class="form-group-section">
+                            <h3 class="group-title">Route</h3>
+                            <div class="form-fields-row">
+                                <div class="flight-field">
+                                    <label>From</label>
+                                    <input type="text" id="flightFrom" placeholder="Cairo (CAI)" required>
+                                </div>
+                                <div class="flight-field">
+                                    <label>To</label>
+                                    <input type="text" id="flightTo" placeholder="Dubai (DXB)" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dates Group -->
+                        <div class="form-group-section">
+                            <h3 class="group-title">Travel Dates</h3>
+                            <div class="form-fields-row">
+                                <div class="flight-field">
+                                    <label>Departure Date</label>
+                                    <input type="date" id="departureDate" required>
+                                </div>
+                                <div class="flight-field return-date-field">
+                                    <label>Return Date</label>
+                                    <input type="date" id="returnDate">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Passengers & Class Group -->
+                        <div class="form-group-section">
+                            <h3 class="group-title">Passengers & Class</h3>
+                            <div class="form-fields-row">
+                                <div class="flight-field">
+                                    <label>Travellers</label>
+                                    <select id="travellers" required>
+                                        <option value="1">1 Traveller</option>
+                                        <option value="2">2 Travellers</option>
+                                        <option value="3">3 Travellers</option>
+                                        <option value="4">4 Travellers</option>
+                                        <option value="5">5 Travellers</option>
+                                        <option value="6">6+ Travellers</option>
+                                    </select>
+                                </div>
+                                <div class="flight-field">
+                                    <label>Cabin Class</label>
+                                    <select id="cabinClass" required>
+                                        <option value="economy">Economy</option>
+                                        <option value="premium">Premium Economy</option>
+                                        <option value="business">Business Class</option>
+                                        <option value="first">First Class</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-large full-width flight-search-btn">Search Flights</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Flight Results Section -->
+    <section id="flightResults" class="flight-results-section" style="display: none;">
+        <div class="container">
+            <div class="results-header">
+                <h2 class="results-title">Available Flights</h2>
+                <p class="results-count"></p>
+            </div>
+            <div id="flightResultsList" class="flight-results-list"></div>
+        </div>
+    </section>
+
+
+
+    <!-- Seat Selection Modal -->
+    <div id="seatSelectionModal" class="seat-selection-modal" aria-hidden="true">
+        <div class="seat-selection-overlay" data-close-seat-modal></div>
+        <div class="seat-selection-dialog" role="dialog" aria-modal="true" aria-labelledby="seatSelectionTitle">
+            <button type="button" class="seat-modal-close" id="closeSeatSelection" aria-label="Close seat selection">&times;</button>
+
+            <div class="seat-selection-header">
+                <div>
+                    <span class="seat-selection-kicker">Seat Reservation</span>
+                    <h3 id="seatSelectionTitle">Choose Your Seats</h3>
+                    <p id="seatSelectionSubtitle">Select your preferred seats on the aircraft map below.</p>
+                </div>
+                <div class="seat-selection-stats">
+                    <div class="seat-stat-card">
+                        <span class="seat-stat-label">Available</span>
+                        <strong id="seatAvailabilityCount">0 free</strong>
+                    </div>
+                    <div class="seat-stat-card">
+                        <span class="seat-stat-label">To select</span>
+                        <strong id="seatNeededCount">0 seats</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seat-selection-layout">
+                <!-- Sidebar -->
+                <aside class="seat-selection-sidebar">
+                    <div class="seat-flight-summary" id="seatFlightSummary"></div>
+
+                    <div class="seat-legend">
+                        <div class="legend-title">Legend</div>
+                        <div class="legend-item">
+                            <div class="legend-left">
+                                <span class="seat-sample available"></span>
+                                Available
+                            </div>
+                            <span class="legend-price" id="legendPriceStd"></span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-left">
+                                <span class="seat-sample premium"></span>
+                                Premium (Exit row)
+                            </div>
+                            <span class="legend-price" id="legendPricePremium"></span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-left">
+                                <span class="seat-sample selected"></span>
+                                Selected
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-left">
+                                <span class="seat-sample occupied"></span>
+                                Reserved
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="seat-selected-box">
+                        <span class="selected-box-label">Your seats</span>
+                        <div id="selectedSeatsPreview" class="selected-seats-preview">No seats selected yet</div>
+                    </div>
+
+                    <!-- Booking Summary -->
+                    <div class="seat-booking-summary" id="seatBookingSummary">
+                        <div class="summary-title">Booking Summary</div>
+                        <div id="summaryLines">
+                            <div class="summary-line">
+                                <span class="summary-line-label">Base fare</span>
+                                <span class="summary-line-value" id="summaryBaseFare">—</span>
+                            </div>
+                            <div class="summary-line" id="summarySeatFeeRow" style="display:none;">
+                                <span class="summary-line-label">Seat fees</span>
+                                <span class="summary-line-value" id="summarySeatFee">—</span>
+                            </div>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-total-line">
+                            <span class="summary-total-label">Total</span>
+                            <span class="summary-total-value" id="summaryTotal">—</span>
+                        </div>
+                    </div>
+
+                    <button type="button" id="confirmSeatReservation" class="btn-primary btn-large seat-confirm-btn" disabled>
+                        Reserve Selected Seats
+                    </button>
+                </aside>
+
+                <!-- Map Stage -->
+                <div class="seat-map-stage">
+                    <div class="aircraft-nose">Front of Aircraft</div>
+                    <div id="seatColHeaders"></div>
+                    <div id="seatMapGrid" class="seat-map-grid"></div>
+                    <div class="aircraft-tail">Rear Cabin</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="booking-footer">
+        <div class="container">
+            <div class="footer-content-simple">
+                <div class="footer-logo">
+                    <span class="logo-icon">✦</span>
+                    <span class="logo-text">ORIGINOVA</span>
+                </div>
+                <p class="footer-text">&copy; 2024 ORIGINOVA. All rights reserved.</p>
+                <div class="footer-links-simple">
+                    <a href="home.html">Home</a>
+                    <a href="home.html#destinations">Destinations</a>
+                    <a href="home.html#contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js?v=6"></script>
+</body>
+</html>

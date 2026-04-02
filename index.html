@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORIGINOVA - Login</title>
+    <script src="auth.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preload" as="image" href="hero.webp" fetchpriority="high">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            --lamp-on: 0;
+            --lamp-rotation: 0deg;
+            --lamp-shift-x: 0px;
+            --lamp-shift-y: 0px;
+            --cord-rotation: 0deg;
+            --cord-stretch: 1;
+        }
+
+        body.login-page {
+            min-height: 100vh;
+            background: #070b12;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .login-page .page-background {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .login-page .page-background img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.08);
+            filter: brightness(calc(0.36 + (var(--lamp-on) * 0.44))) saturate(calc(0.88 + (var(--lamp-on) * 0.26)));
+            transition: filter 0.45s ease;
+            animation: loginKenBurns 18s ease-in-out infinite alternate;
+        }
+
+        .login-page .page-background::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(4, 6, 12, 0.82) 0%, rgba(7, 10, 18, 0.9) 52%, rgba(4, 6, 12, 0.98) 100%);
+            opacity: calc(1 - (var(--lamp-on) * 0.46));
+            transition: opacity 0.45s ease;
+        }
+
+        .login-page .page-background::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at center top, rgba(255, 219, 120, calc(0.62 * var(--lamp-on))) 0%, rgba(255, 219, 120, calc(0.26 * var(--lamp-on))) 22%, rgba(255, 219, 120, calc(0.08 * var(--lamp-on))) 42%, rgba(10, 10, 20, 0) 72%),
+                linear-gradient(135deg, rgba(15, 15, 30, calc(0.94 - (var(--lamp-on) * 0.34))) 0%, rgba(15, 15, 30, calc(0.76 - (var(--lamp-on) * 0.3))) 100%);
+            transition: background 0.5s ease;
+        }
+
+        @keyframes loginKenBurns {
+            from { transform: scale(1.05); }
+            to { transform: scale(1.12); }
+        }
+
+        .login-wrapper {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 160px 0 80px;
+        }
+
+        .login-showcase {
+            width: 100%;
+            display: grid;
+            grid-template-columns: minmax(260px, 360px) minmax(320px, 520px);
+            align-items: center;
+            justify-content: center;
+            gap: 70px;
+        }
+
+        .lamp-zone {
+            position: relative;
+            min-height: 520px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 10px;
+        }
+
+        .lamp-anchor {
+            position: absolute;
+            top: -120px;
+            width: 6px;
+            height: 140px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(255,255,255,0.8));
+            border-radius: 999px;
+            opacity: 0.85;
+        }
+
+        .lamp {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transform-origin: top center;
+            transform: translate3d(var(--lamp-shift-x), var(--lamp-shift-y), 0) rotate(var(--lamp-rotation));
+            will-change: transform;
+            touch-action: none;
+        }
+
+        .lamp-head {
+            position: relative;
+            width: 170px;
+            height: 90px;
+            border-radius: 95px 95px 24px 24px;
+            background: linear-gradient(180deg, #fff9e8 0%, #efe3b8 55%, #b8942a 100%);
+            box-shadow:
+                0 25px 60px rgba(0, 0, 0, 0.42),
+                0 0 calc(170px * var(--lamp-on)) rgba(244, 208, 63, 0.72);
+            overflow: visible;
+        }
+
+        .lamp-head::before {
+            content: "";
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 106px;
+            height: 22px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.55);
+            filter: blur(3px);
+        }
+
+        .lamp-head::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 112px;
+            height: 18px;
+            background: radial-gradient(circle, rgba(255, 244, 194, 0.85) 0%, rgba(255, 244, 194, 0.18) 65%, rgba(255, 244, 194, 0) 100%);
+            opacity: calc(0.2 + (var(--lamp-on) * 0.9));
+            transition: opacity 0.35s ease;
+        }
+
+        .lamp-neck {
+            width: 12px;
+            height: 180px;
+            background: linear-gradient(180deg, #f4e7be 0%, #d0b15b 55%, #9f7c22 100%);
+            border-radius: 999px;
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.25);
+        }
+
+        .lamp-base {
+            width: 120px;
+            height: 18px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #f8e7b1 0%, #d4af37 52%, #8f6b15 100%);
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.35);
+        }
+
+        .light-cone {
+            position: absolute;
+            top: 78px;
+            width: 420px;
+            height: 430px;
+            background: radial-gradient(ellipse at top, rgba(255, 236, 176, 0.62) 0%, rgba(255, 236, 176, 0.24) 26%, rgba(255, 236, 176, 0.08) 56%, rgba(255, 236, 176, 0) 78%);
+            clip-path: polygon(42% 0%, 58% 0%, 100% 100%, 0% 100%);
+            filter: blur(7px);
+            opacity: calc(var(--lamp-on) * 1);
+            transform: translateY(8px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none;
+        }
+
+        .lamp-page-title {
+            position: absolute;
+            bottom: 34px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 15px;
+            letter-spacing: 0.08em;
+        }
+
+        .cord {
+            position: absolute;
+            top: 82px;
+            right: 48px;
+            width: 3px;
+            height: 96px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.85), rgba(203, 203, 203, 0.55));
+            border-radius: 999px;
+            transform-origin: top center;
+            transform: rotate(var(--cord-rotation)) scaleY(var(--cord-stretch));
+            cursor: grab;
+            z-index: 3;
+            will-change: transform;
+            touch-action: none;
+        }
+
+        .cord-handle {
+            position: absolute;
+            bottom: -13px;
+            left: 50%;
+            width: 18px;
+            height: 18px;
+            transform: translateX(-50%);
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            box-shadow: 0 0 18px rgba(244, 208, 63, 0.6);
+        }
+
+        .login-panel {
+            position: relative;
+            background: rgba(255, 255, 255, 0.055);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            opacity: 0.72;
+            transform: translateY(16px);
+            transition: transform 0.45s ease, opacity 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease, background 0.45s ease;
+        }
+
+        .login-panel.active {
+            opacity: 1;
+            transform: translateY(0);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(212, 175, 55, 0.42);
+            box-shadow: 0 35px 90px rgba(0, 0, 0, 0.46), 0 0 40px rgba(212, 175, 55, 0.22);
+        }
+
+        .login-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            margin-bottom: 22px;
+            background: rgba(212, 175, 55, 0.12);
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            color: var(--primary-color);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .login-title {
+            font-family: var(--font-heading);
+            font-size: clamp(38px, 5vw, 56px);
+            line-height: 1.08;
+            margin-bottom: 16px;
+        }
+
+        .login-title span {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-description {
+            color: var(--text-secondary);
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 32px;
+            max-width: 520px;
+        }
+
+        .login-form {
+            display: grid;
+            gap: 18px;
+        }
+
+        .input-group {
+            display: grid;
+            gap: 10px;
+        }
+
+        .input-group label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .login-page .input-group input {
+            width: 100%;
+            padding: 15px 18px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.055);
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+            font-size: 15px;
+            transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-page .input-group input::placeholder {
+            color: rgba(255,255,255,0.42);
+        }
+
+        .login-page .input-group input:focus {
+            outline: none;
+            border-color: rgba(212, 175, 55, 0.78);
+            background: rgba(255, 255, 255, 0.11);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.16);
+        }
+
+        .login-form-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 2px;
+        }
+
+        .remember-option {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .remember-option input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+        }
+
+        .forgot-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .forgot-link:hover {
+            color: #f4d03f;
+        }
+
+        .login-page .btn-login-submit {
+            width: 100%;
+            margin-top: 8px;
+            padding: 15px 28px;
+            border-radius: 16px;
+            border: none;
+            background: var(--accent-gradient);
+            color: var(--secondary-color);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 14px 30px rgba(212, 175, 55, 0.22);
+        }
+
+        .login-page .btn-login-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 36px rgba(212, 175, 55, 0.28);
+        }
+
+        .panel-footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 20px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .panel-footer a {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .panel-footer a:hover {
+            color: var(--primary-color);
+        }
+
+        .login-status {
+            min-height: 24px;
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--primary-color);
+        }
+
+        .navbar.login-navbar {
+            background: rgba(15, 15, 30, 0.45);
+            backdrop-filter: blur(12px);
+        }
+
+        .login-navbar .btn-home {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        .login-navbar .nav-actions {
+            display: flex;
+        }
+
+
+        @media (max-width: 992px) {
+            .login-showcase {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .lamp-zone {
+                min-height: 420px;
+                order: -1;
+            }
+
+            .lamp-page-title {
+                bottom: 10px;
+            }
+
+            .login-panel {
+                padding: 32px 26px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .login-wrapper {
+                padding-top: 130px;
+            }
+
+            .login-showcase {
+                gap: 22px;
+            }
+
+            .lamp-zone {
+                min-height: 360px;
+            }
+
+            .lamp-head {
+                width: 140px;
+                height: 76px;
+            }
+
+            .lamp-neck {
+                height: 145px;
+            }
+
+            .lamp-base {
+                width: 98px;
+            }
+
+            .cord {
+                right: 38px;
+                height: 84px;
+            }
+
+            .light-cone {
+                width: 280px;
+                height: 300px;
+                top: 64px;
+            }
+
+            .login-title {
+                font-size: 34px;
+            }
+
+            .panel-footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .login-navbar .nav-actions {
+                display: flex !important;
+                gap: 8px;
+            }
+
+            .login-navbar .btn-home,
+            .login-navbar .btn-booking {
+                display: inline-flex !important;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+        }
+
+
+        @media (max-width: 600px) {
+            .login-wrapper {
+                padding: 116px 0 52px;
+            }
+
+            .login-navbar .nav-content {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .login-navbar .logo {
+                width: 100%;
+                justify-content: center;
+                font-size: 21px;
+            }
+
+            .login-navbar .nav-actions {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .login-navbar .btn-home,
+            .login-navbar .btn-booking {
+                flex: 1 1 145px;
+                min-width: 0;
+                text-align: center;
+                justify-content: center;
+            }
+
+            .login-navbar .mobile-menu-toggle {
+                display: none !important;
+            }
+
+            .lamp-zone {
+                min-height: 260px;
+            }
+
+            .lamp-anchor {
+                top: -92px;
+                height: 112px;
+            }
+
+            .login-panel {
+                padding: 26px 18px;
+                border-radius: 24px;
+            }
+
+            .login-description {
+                font-size: 15px;
+                line-height: 1.7;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .login-title {
+                font-size: 30px;
+            }
+
+            .login-page .input-group input {
+                font-size: 16px;
+                padding: 14px 16px;
+            }
+
+            .panel-footer {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="login-page">
+    <div class="page-background">
+        <img src="hero.webp" alt="ORIGINOVA luxury travel background" fetchpriority="high" decoding="async">
+    </div>
+
+    <nav class="navbar login-navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <img src="logo.webp" class="logo-icon" alt="logo">
+                    <span class="logo-text">ORIGINOVA</span>
+                </div>
+                <div class="nav-actions">
+                    <a href="home.html" class="btn-secondary btn-home">Homepage</a>
+                    <a href="booking-flight.html" class="btn-primary btn-booking">Booking Flight</a>
+                </div>
+                <div class="mobile-menu-toggle" aria-hidden="true" style="visibility:hidden;">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="login-wrapper">
+        <div class="container">
+            <section class="login-showcase">
+                <div class="lamp-zone">
+                    <div class="lamp-anchor"></div>
+                    <div class="lamp" id="lamp">
+                        <div class="lamp-head"></div>
+                        <div class="cord" id="cord" aria-label="Pull lamp rope" title="Pull the rope to turn the lamp on">
+                            <span class="cord-handle"></span>
+                        </div>
+                        <div class="light-cone"></div>
+                        <div class="lamp-neck"></div>
+                        <div class="lamp-base"></div>
+                    </div>
+                                    </div>
+
+                <div class="login-panel" id="loginPanel">
+                    <div class="login-badge">Member Access</div>
+                    <h1 class="login-title">Welcome back to <span>ORIGINOVA</span></h1>
+                    <p class="login-description">
+                        Sign in to access your account, manage your bookings, and continue your journey with ORIGINOVA.
+                    </p>
+
+                    <form class="login-form" id="loginForm">
+                        <div class="input-group">
+                            <label for="username">Email or Username</label>
+                            <input id="username" name="username" type="text" placeholder="Enter your email or username" autocomplete="username">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="password">Password</label>
+                            <input id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password">
+                        </div>
+
+                        <div class="login-form-row">
+                            <label class="remember-option">
+                                <input type="checkbox" name="remember">
+                                <span>Remember me</span>
+                            </label>
+
+                            <a href="#" class="forgot-link">Forgot password?</a>
+                        </div>
+
+                        <button type="submit" class="btn-login-submit">Log In</button>
+                        <div class="login-status" id="loginStatus"></div>
+                    </form>
+
+                    <div class="panel-footer">
+                        <span>New here? <a href="#">Create an account</a></span>
+                        <a href="home.html">Go to homepage after login</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <audio id="clickSound" preload="auto">
+        <source src="https://www.soundjay.com/buttons/sounds/button-16.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        let isLampOn = false;
+        let angle = 0;
+        let angularVelocity = 0;
+        let pullAmount = 0;
+        let targetPullAmount = 0;
+        let isDraggingCord = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let lastDragTime = 0;
+
+        const root = document.documentElement;
+        const body = document.body;
+        const lamp = document.getElementById('lamp');
+        const cord = document.getElementById('cord');
+        const loginPanel = document.getElementById('loginPanel');
+        const loginForm = document.getElementById('loginForm');
+        const loginStatus = document.getElementById('loginStatus');
+        const clickSound = document.getElementById('clickSound');
+
+        const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+        gsap.from('.login-panel', {
+            y: 40,
+            opacity: 0,
+            duration: 0.9,
+            ease: 'power3.out'
+        });
+
+        gsap.from('.lamp', {
+            y: -40,
+            opacity: 0,
+            duration: 0.9,
+            ease: 'power3.out'
+        });
+
+        function renderLampPhysics() {
+            if (!isDraggingCord) {
+                const restoringForce = -Math.sin(angle) * 0.024;
+                angularVelocity += restoringForce;
+                angularVelocity *= 0.985;
+                angle += angularVelocity;
+                targetPullAmount *= 0.84;
+            }
+
+            pullAmount += (targetPullAmount - pullAmount) * 0.18;
+
+            root.style.setProperty('--lamp-rotation', `${(angle * 180 / Math.PI).toFixed(2)}deg`);
+            root.style.setProperty('--lamp-shift-x', `${(Math.sin(angle) * 6).toFixed(2)}px`);
+            root.style.setProperty('--lamp-shift-y', `${(Math.abs(Math.sin(angle)) * 2).toFixed(2)}px`);
+            root.style.setProperty('--cord-rotation', `${(-angle * 180 / Math.PI * 0.38).toFixed(2)}deg`);
+            root.style.setProperty('--cord-stretch', (1 + pullAmount / 130).toFixed(3));
+
+            requestAnimationFrame(renderLampPhysics);
+        }
+
+        renderLampPhysics();
+
+        function nudgeLamp(force = 0.07) {
+            angularVelocity += force;
+        }
+
+        function startCordDrag(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            isDraggingCord = true;
+            dragStartX = event.clientX;
+            dragStartY = event.clientY;
+            lastDragTime = performance.now();
+            cord.style.cursor = 'grabbing';
+            cord.setPointerCapture?.(event.pointerId);
+        }
+
+        function moveCordDrag(event) {
+            if (!isDraggingCord) return;
+
+            const deltaX = event.clientX - dragStartX;
+            const deltaY = Math.max(0, event.clientY - dragStartY);
+            const nextAngle = clamp((deltaX / 170) + (deltaY / 520), -0.28, 0.28);
+            const now = performance.now();
+            const deltaTime = Math.max(now - lastDragTime, 16);
+
+            targetPullAmount = clamp(deltaY, 0, 48);
+            angularVelocity = (nextAngle - angle) / deltaTime * 18;
+            angle = nextAngle;
+            lastDragTime = now;
+        }
+
+        function endCordDrag(event) {
+            if (!isDraggingCord) return;
+
+            const deltaX = event.clientX - dragStartX;
+            const deltaY = Math.max(0, event.clientY - dragStartY);
+
+            isDraggingCord = false;
+            cord.style.cursor = 'grab';
+            targetPullAmount = 0;
+            angularVelocity += clamp((deltaX / 420) + (deltaY / 860), -0.12, 0.12);
+            cord.releasePointerCapture?.(event.pointerId);
+
+            if (deltaY > 18 || Math.abs(deltaX) > 12) {
+                toggleLamp();
+            } else {
+                nudgeLamp(deltaX >= 0 ? 0.05 : -0.05);
+            }
+        }
+
+        cord.addEventListener('pointerdown', startCordDrag);
+        window.addEventListener('pointermove', moveCordDrag);
+        window.addEventListener('pointerup', endCordDrag);
+        window.addEventListener('pointercancel', endCordDrag);
+
+        cord.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        lamp.addEventListener('click', () => {
+            nudgeLamp(isLampOn ? -0.06 : 0.06);
+            toggleLamp();
+        });
+
+        function toggleLamp() {
+            isLampOn = !isLampOn;
+            root.style.setProperty('--lamp-on', isLampOn ? 1 : 0);
+            loginPanel.classList.toggle('active', isLampOn);
+            targetPullAmount = Math.max(targetPullAmount, 10);
+            angularVelocity += isLampOn ? 0.035 : -0.035;
+
+            try {
+                clickSound.currentTime = 0;
+                clickSound.play();
+            } catch (e) {}
+
+            gsap.to(body, {
+                backgroundColor: isLampOn ? '#1a2232' : '#070b12',
+                duration: 0.45,
+                ease: 'power2.out'
+            });
+
+            if (isLampOn) {
+                loginStatus.textContent = 'Lamp is on. You can sign in anytime.';
+            } else {
+                loginStatus.textContent = 'Lamp is off. You can still sign in normally.';
+            }
+        }
+
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const username = loginForm.username.value.trim();
+            const password = loginForm.password.value.trim();
+            const remember = loginForm.remember.checked;
+
+            if (!username || !password) {
+                loginStatus.textContent = 'Please enter both your username and password.';
+                return;
+            }
+
+            if (!window.OriginovaAuth) {
+                loginStatus.textContent = 'Authentication system is unavailable. Please refresh the page.';
+                return;
+            }
+
+            window.OriginovaAuth.login({ username, remember });
+            loginStatus.textContent = 'Login successful. Redirecting to the homepage...';
+            gsap.fromTo('.btn-login-submit',
+                { scale: 1 },
+                { scale: 1.04, duration: 0.18, yoyo: true, repeat: 1, ease: 'power1.out' }
+            );
+
+            setTimeout(() => {
+                window.location.href = window.OriginovaAuth.getPostLoginRedirect();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

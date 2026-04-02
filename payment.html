@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - ORIGINOVA</title>
+    <script src="auth.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="booking-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .payment-page {
+            background: var(--dark-bg);
+            min-height: 100vh;
+        }
+
+        .payment-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 140px 40px 80px;
+        }
+
+        .payment-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .payment-main {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+        }
+
+        .payment-title {
+            font-family: var(--font-heading);
+            font-size: 32px;
+            margin-bottom: 32px;
+            color: var(--text-primary);
+        }
+
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .payment-method {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .payment-method:hover {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .payment-method.active {
+            border-color: var(--primary-color);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .payment-method-icon {
+            width: 64px;
+            min-width: 64px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-method-brand,
+        .payment-method-brand-group {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .payment-method-brand img,
+        .payment-method-brand-group img {
+            display: block;
+            background: transparent;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            object-fit: contain;
+        }
+
+        .payment-method-brand img {
+            width: 48px;
+            height: 48px;
+            padding: 2px;
+        }
+
+        /* Per-logo adjustments for different whitespace amounts */
+        .logo-card {
+            padding: 0 !important;
+            transform: scale(1.5);
+        }
+
+        .logo-vodafone {
+            padding: 0 !important;
+            transform: scale(1.6);
+        }
+
+        .logo-etisalat {
+            padding: 0 !important;
+            transform: scale(1.6);
+        }
+
+        .logo-fawry {
+            padding: 0 !important;
+            transform: scale(1.7);
+        }
+
+        .payment-method-brand-group img {
+            width: 28px;
+            height: 28px;
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .wallet-brand-group {
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+        .wallet-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.14);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+            white-space: nowrap;
+        }
+
+        .wallet-chip:nth-child(1) { background: #111; }
+        .wallet-chip:nth-child(2) { background: #ffffff; color: #1f2937; }
+        .wallet-chip:nth-child(3) { background: linear-gradient(135deg, #003087, #009cde); }
+
+        .payment-method-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .payment-method-logos {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            margin-left: auto;
+        }
+
+        .payment-logo {
+            height: 28px;
+            min-width: 46px;
+            padding: 0 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            border: 1px solid rgba(255,255,255,0.14);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+            white-space: nowrap;
+        }
+
+        .payment-logo.visa {
+            background: linear-gradient(135deg, #1a1f71, #1434cb);
+            color: #fff;
+        }
+
+        .payment-logo.mastercard {
+            background: linear-gradient(135deg, #eb001b, #f79e1b);
+            color: #fff;
+        }
+
+        .payment-logo.apple {
+            background: #111;
+            color: #fff;
+        }
+
+        .payment-logo.google {
+            background: #fff;
+            color: #1f2937;
+        }
+
+        .payment-logo.paypal {
+            background: linear-gradient(135deg, #003087, #009cde);
+            color: #fff;
+        }
+
+        .payment-logo.fawry {
+            background: linear-gradient(135deg, #0057a3, #f59e0b);
+            color: #fff;
+        }
+
+        .payment-logo.vodafone {
+            background: linear-gradient(135deg, #e60000, #b00000);
+            color: #fff;
+        }
+
+        .payment-logo.etisalat {
+            background: linear-gradient(135deg, #00a651, #6cc24a);
+            color: #fff;
+        }
+
+        .payment-method-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .payment-method-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .payment-form {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .payment-form.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+            font-size: 15px;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .booking-summary {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 32px;
+            position: sticky;
+            top: 120px;
+        }
+
+        .summary-title {
+            font-family: var(--font-heading);
+            font-size: 24px;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .summary-value {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .summary-total {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-total-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .summary-total-amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .btn-pay {
+            width: 100%;
+            margin-top: 24px;
+            padding: 16px;
+            font-size: 18px;
+        }
+
+        .no-booking-message {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .no-booking-message h2 {
+            font-family: var(--font-heading);
+            font-size: 32px;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .no-booking-message p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 968px) {
+            .payment-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-summary {
+                position: static;
+                order: -1;
+            }
+
+            .payment-container {
+                padding: 120px 20px 60px;
+            }
+
+            .payment-main {
+                padding: 24px;
+            }
+
+            .booking-summary {
+                padding: 24px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-method {
+                align-items: flex-start;
+            }
+
+            .payment-method-icon {
+                width: 56px;
+                min-width: 56px;
+            }
+
+            .payment-method-brand img {
+                width: 42px;
+                height: 42px;
+            }
+
+            .payment-method-brand-group img {
+                width: 24px;
+                height: 24px;
+            }
+
+            .payment-method-logos {
+                justify-content: flex-start;
+                margin-left: 0;
+                margin-top: 8px;
+            }
+        }
+
+        @media (max-width: 968px) {
+            .payment-method {
+                flex-wrap: wrap;
+                padding: 18px;
+                gap: 12px 16px;
+            }
+
+            .payment-method-info {
+                flex: 1 1 calc(100% - 72px);
+                min-width: 0;
+            }
+
+            .payment-method-logos {
+                width: 100%;
+                padding-left: 72px;
+                margin-top: 0;
+                justify-content: flex-start;
+            }
+
+            .payment-method-name,
+            .payment-method-desc,
+            .summary-label,
+            .summary-value {
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
+
+            .summary-item,
+            .summary-total {
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .payment-container {
+                padding: 110px 16px 48px;
+            }
+
+            .payment-main,
+            .booking-summary {
+                padding: 20px;
+            }
+
+            .payment-title {
+                font-size: 28px;
+                margin-bottom: 24px;
+            }
+
+            .payment-method-icon {
+                width: 48px;
+                min-width: 48px;
+            }
+
+            .payment-method-logos {
+                padding-left: 64px;
+            }
+
+            .logo {
+                gap: 8px;
+                font-size: 22px;
+            }
+
+            .logo-icon {
+                width: 48px;
+                height: 48px;
+            }
+
+            .nav-content {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .btn-back {
+                width: 100%;
+                text-align: center;
+            }
+
+            .summary-total-amount {
+                font-size: 26px;
+            }
+        }
+
+    </style>
+</head>
+<body class="payment-page">
+    <!-- Navigation -->
+    <nav class="navbar booking-navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="home.html" class="logo">
+                    <img src="logo.webp" class="logo-icon" alt="logo">
+                    <span class="logo-text">ORIGINOVA</span>
+                </a>
+                <a href="home.html" class="btn-secondary btn-back">Back to Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Payment Content -->
+    <div class="payment-container">
+        <div id="paymentContent"></div>
+    </div>
+
+    <script src="payment-utils.js"></script>
+    <script>
+        // Load booking data and render payment page
+        document.addEventListener('DOMContentLoaded', () => {
+            const bookingData = getBookingData();
+            const contentDiv = document.getElementById('paymentContent');
+
+            if (!bookingData || !bookingData.amount) {
+                contentDiv.innerHTML = `
+                    <div class="no-booking-message">
+                        <h2>No Booking Found</h2>
+                        <p>It looks like you haven't selected a booking yet. Please go back and choose your travel option.</p>
+                        <a href="home.html" class="btn-primary btn-large">Browse Destinations</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Render payment page
+            renderPaymentPage(bookingData);
+        });
+
+        function renderPaymentPage(booking) {
+            const contentDiv = document.getElementById('paymentContent');
+
+            contentDiv.innerHTML = `
+                <div class="payment-grid">
+                    <div class="payment-main">
+                        <h1 class="payment-title">Payment Details</h1>
+
+                        <div class="payment-methods">
+                            <div class="payment-method active" data-method="card">
+                                <div class="payment-method-icon"><div class="payment-method-brand"><img src="assets/payment-logos/card-brands.avif" alt="Card brands" loading="lazy" class="logo-card"></div></div>
+                                <div class="payment-method-info">
+                                    <div class="payment-method-name">Credit / Debit Card</div>
+                                    <div class="payment-method-desc">Pay securely with your card</div>
+                                </div>
+                                <div class="payment-method-logos" aria-hidden="true">
+                                    <span class="payment-logo visa">VISA</span>
+                                    <span class="payment-logo mastercard">Mastercard</span>
+                                </div>
+                            </div>
+                            <div class="payment-method" data-method="wallet">
+                                <div class="payment-method-icon"><div class="payment-method-brand-group wallet-brand-group"><span class="wallet-chip">Apple Pay</span><span class="wallet-chip">G Pay</span><span class="wallet-chip">PayPal</span></div></div>
+                                <div class="payment-method-info">
+                                    <div class="payment-method-name">Digital Wallet</div>
+                                    <div class="payment-method-desc">Apple Pay, Google Pay, PayPal</div>
+                                </div>
+                                <div class="payment-method-logos" aria-hidden="true">
+                                    <span class="payment-logo apple">Apple Pay</span>
+                                    <span class="payment-logo google">G Pay</span>
+                                    <span class="payment-logo paypal">PayPal</span>
+                                </div>
+                            </div>
+                            <div class="payment-method" data-method="vodafone">
+                                <div class="payment-method-icon"><div class="payment-method-brand"><img src="assets/payment-logos/vodafone-cash.png" alt="Vodafone Cash logo" loading="lazy" referrerpolicy="no-referrer" class="logo-vodafone"></div></div>
+                                <div class="payment-method-info">
+                                    <div class="payment-method-name">Vodafone Cash</div>
+                                    <div class="payment-method-desc">Pay using your Vodafone Cash wallet</div>
+                                </div>
+                                <div class="payment-method-logos" aria-hidden="true">
+                                    <span class="payment-logo vodafone">Vodafone Cash</span>
+                                </div>
+                            </div>
+                            <div class="payment-method" data-method="etisalat">
+                                <div class="payment-method-icon"><div class="payment-method-brand"><img src="assets/payment-logos/etisalat-cash.png" alt="Etisalat Cash logo" loading="lazy" referrerpolicy="no-referrer" class="logo-etisalat"></div></div>
+                                <div class="payment-method-info">
+                                    <div class="payment-method-name">Etisalat Cash</div>
+                                    <div class="payment-method-desc">Pay using your Etisalat Cash wallet</div>
+                                </div>
+                                <div class="payment-method-logos" aria-hidden="true">
+                                    <span class="payment-logo etisalat">Etisalat Cash</span>
+                                </div>
+                            </div>
+                            <div class="payment-method" data-method="fawry">
+                                <div class="payment-method-icon"><div class="payment-method-brand"><img src="assets/payment-logos/fawry.png" alt="Fawry logo" loading="lazy" referrerpolicy="no-referrer" class="logo-fawry"></div></div>
+                                <div class="payment-method-info">
+                                    <div class="payment-method-name">Fawry</div>
+                                    <div class="payment-method-desc">Pay at any Fawry location</div>
+                                </div>
+                                <div class="payment-method-logos" aria-hidden="true">
+                                    <span class="payment-logo fawry">FAWRY</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Payment Form -->
+                        <div class="payment-form active" id="cardForm">
+                            <form id="cardPaymentForm">
+                                <div class="form-group">
+                                    <label>Cardholder Name</label>
+                                    <input type="text" placeholder="John Doe" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Card Number</label>
+                                    <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Expiry Date</label>
+                                        <input type="text" placeholder="MM/YY" maxlength="5" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>CVV</label>
+                                        <input type="text" placeholder="123" maxlength="3" required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-primary btn-pay">Pay $${booking.amount.toLocaleString()}</button>
+                            </form>
+                        </div>
+
+                        <!-- Wallet Payment Form -->
+                        <div class="payment-form" id="walletForm">
+                            <form id="walletPaymentForm">
+                                <div class="form-group">
+                                    <label>Select Wallet</label>
+                                    <select required>
+                                        <option value="">Choose wallet...</option>
+                                        <option value="apple">Apple Pay</option>
+                                        <option value="google">Google Pay</option>
+                                        <option value="paypal">PayPal</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Email Address</label>
+                                    <input type="email" placeholder="your@email.com" required>
+                                </div>
+                                <button type="submit" class="btn-primary btn-pay">Pay $${booking.amount.toLocaleString()}</button>
+                            </form>
+                        </div>
+
+                        <!-- Vodafone Cash Payment Form -->
+                        <div class="payment-form" id="vodafoneForm">
+                            <form id="vodafonePaymentForm">
+                                <div class="form-group">
+                                    <label>Vodafone Cash Number</label>
+                                    <input type="tel" placeholder="01XXXXXXXXX" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Account Holder Name</label>
+                                    <input type="text" placeholder="Enter full name" required>
+                                </div>
+                                <button type="submit" class="btn-primary btn-pay">Pay $${booking.amount.toLocaleString()}</button>
+                            </form>
+                        </div>
+
+                        <!-- Etisalat Cash Payment Form -->
+                        <div class="payment-form" id="etisalatForm">
+                            <form id="etisalatPaymentForm">
+                                <div class="form-group">
+                                    <label>Etisalat Cash Number</label>
+                                    <input type="tel" placeholder="01XXXXXXXXX" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Account Holder Name</label>
+                                    <input type="text" placeholder="Enter full name" required>
+                                </div>
+                                <button type="submit" class="btn-primary btn-pay">Pay $${booking.amount.toLocaleString()}</button>
+                            </form>
+                        </div>
+
+                        <!-- Fawry Payment Form -->
+                        <div class="payment-form" id="fawryForm">
+                            <form id="fawryPaymentForm">
+                                <div class="form-group">
+                                    <label>Mobile Number</label>
+                                    <input type="tel" placeholder="01XXXXXXXXX" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Email Address</label>
+                                    <input type="email" placeholder="your@email.com" required>
+                                </div>
+                                <button type="submit" class="btn-primary btn-pay">Generate Fawry Code</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="booking-summary">
+                        <h2 class="summary-title">Booking Summary</h2>
+                        ${renderBookingSummary(booking)}
+                        <div class="summary-total">
+                            <div class="summary-total-label">Total Amount</div>
+                            <div class="summary-total-amount">$${booking.amount.toLocaleString()}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Attach event listeners
+            attachPaymentHandlers();
+        }
+
+        function renderBookingSummary(booking) {
+            let summaryHTML = '';
+
+            if (booking.type === 'flight') {
+                summaryHTML = `
+                    <div class="summary-item">
+                        <span class="summary-label">Flight</span>
+                        <span class="summary-value">${booking.name}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Route</span>
+                        <span class="summary-value">${booking.from} → ${booking.to}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Departure</span>
+                        <span class="summary-value">${new Date(booking.departureDate).toLocaleDateString()}</span>
+                    </div>
+                    ${booking.returnDate ? `
+                    <div class="summary-item">
+                        <span class="summary-label">Return</span>
+                        <span class="summary-value">${new Date(booking.returnDate).toLocaleDateString()}</span>
+                    </div>
+                    ` : ''}
+                    <div class="summary-item">
+                        <span class="summary-label">Cabin Class</span>
+                        <span class="summary-value">${booking.cabinClass}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Travellers</span>
+                        <span class="summary-value">${booking.travellers}</span>
+                    </div>
+                `;
+            } else if (booking.type === 'offer' || booking.type === 'package') {
+                summaryHTML = `
+                    <div class="summary-item">
+                        <span class="summary-label">Package</span>
+                        <span class="summary-value">${booking.name}</span>
+                    </div>
+                    ${booking.duration ? `
+                    <div class="summary-item">
+                        <span class="summary-label">Duration</span>
+                        <span class="summary-value">${booking.duration}</span>
+                    </div>
+                    ` : ''}
+                `;
+            } else if (booking.type === 'service') {
+                summaryHTML = `
+                    <div class="summary-item">
+                        <span class="summary-label">Service</span>
+                        <span class="summary-value">${booking.name}</span>
+                    </div>
+                `;
+
+                if (booking.details) {
+                    Object.keys(booking.details).forEach(key => {
+                        if (booking.details[key] && key !== 'requirements') {
+                            summaryHTML += `
+                                <div class="summary-item">
+                                    <span class="summary-label">${key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                                    <span class="summary-value">${booking.details[key]}</span>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+            }
+
+            return summaryHTML;
+        }
+
+        function attachPaymentHandlers() {
+            // Payment method selection
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            const paymentForms = document.querySelectorAll('.payment-form');
+
+            paymentMethods.forEach(method => {
+                method.addEventListener('click', () => {
+                    const methodType = method.getAttribute('data-method');
+
+                    // Update active states
+                    paymentMethods.forEach(m => m.classList.remove('active'));
+                    method.classList.add('active');
+
+                    // Show corresponding form
+                    paymentForms.forEach(form => form.classList.remove('active'));
+                    document.getElementById(`${methodType}Form`).classList.add('active');
+                });
+            });
+
+            // Form submissions
+            document.getElementById('cardPaymentForm').addEventListener('submit', handlePayment);
+            document.getElementById('walletPaymentForm').addEventListener('submit', handlePayment);
+            document.getElementById('vodafonePaymentForm').addEventListener('submit', handlePayment);
+            document.getElementById('etisalatPaymentForm').addEventListener('submit', handlePayment);
+            document.getElementById('fawryPaymentForm').addEventListener('submit', handlePayment);
+        }
+
+        function handlePayment(e) {
+            e.preventDefault();
+
+            // Simulate payment processing
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+
+            submitBtn.textContent = 'Processing...';
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                // Redirect to success page
+                window.location.href = 'payment-success.html';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
