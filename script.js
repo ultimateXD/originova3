@@ -869,6 +869,20 @@ const seatSelectionState = {
     totalWithFees: 0
 };
 
+// Handle scroll hint for mobile seat map
+function initSeatMapScrollHint() {
+    const seatMapStage = document.querySelector('.seat-map-stage');
+    if (!seatMapStage) return;
+    
+    seatMapStage.addEventListener('scroll', function() {
+        if (this.scrollLeft > 20) {
+            this.classList.add('scrolled');
+        } else {
+            this.classList.remove('scrolled');
+        }
+    }, { passive: true });
+}
+
 // Seat layout definitions per cabin class
 // layout: defines the physical column groups separated by aisles
 // Each entry in `groups` is an array of column letters for that block
@@ -984,6 +998,9 @@ function openSeatSelectionModal(flight, travellers) {
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    
+    // Initialize scroll hint for mobile
+    requestAnimationFrame(initSeatMapScrollHint);
 }
 
 function closeSeatSelectionModal() {
@@ -1097,10 +1114,18 @@ function renderSeatSelectionModal() {
         return `${labelHtml}${renderSeatRow(rowNum, rowSeats, layout)}`;
     }).join('');
 
-    // Re-attach click listeners
-    seatMapGrid.querySelectorAll('.seat-btn:not([disabled])').forEach(button => {
-        button.addEventListener('click', () => toggleSeatSelection(button.dataset.seatId));
-    });
+    // Use event delegation - attach listener once to parent instead of each button
+    // Remove old listener first to prevent duplicates
+    seatMapGrid.removeEventListener('click', handleSeatMapClick);
+    seatMapGrid.addEventListener('click', handleSeatMapClick);
+}
+
+// Event delegation handler for seat map clicks - better performance
+function handleSeatMapClick(e) {
+    const button = e.target.closest('.seat-btn:not([disabled])');
+    if (button && button.dataset.seatId) {
+        toggleSeatSelection(button.dataset.seatId);
+    }
 }
 
 function buildRowGridStyle(layout) {
@@ -1198,28 +1223,64 @@ function renderSeatButton(seat) {
 }
 
 function toggleSeatSelection(seatId) {
-    const { selectedSeats, travellers } = seatSelectionState;
+    const { selectedSeats, travellers, flight } = seatSelectionState;
     const selectedIndex = selectedSeats.indexOf(seatId);
 
     if (selectedIndex > -1) {
         selectedSeats.splice(selectedIndex, 1);
-        renderSeatSelectionModal();
-        return;
+    } else {
+        if (selectedSeats.length >= travellers) {
+            showNotification(`You can select up to ${travellers} seat${travellers === 1 ? '' : 's'} for this booking.`, 'info');
+            return;
+        }
+        selectedSeats.push(seatId);
+        selectedSeats.sort((a, b) => {
+            const rowA = parseInt(a, 10);
+            const rowB = parseInt(b, 10);
+            if (rowA === rowB) return a.localeCompare(b);
+            return rowA - rowB;
+        });
     }
+    
+    // Optimized update - only update changed elements instead of full re-render
+    updateSeatSelectionUI(seatId, flight, travellers, selectedSeats);
+}
 
-    if (selectedSeats.length >= travellers) {
-        showNotification(`You can select up to ${travellers} seat${travellers === 1 ? '' : 's'} for this booking.`, 'info');
-        return;
+// Lightweight UI update function - avoids full DOM rebuild
+function updateSeatSelectionUI(changedSeatId, flight, travellers, selectedSeats) {
+    const layout = getSeatLayout(flight.cabinClassKey);
+    
+    // Update only the changed seat button
+    const seatBtn = document.querySelector(`.seat-btn[data-seat-id="${changedSeatId}"]`);
+    if (seatBtn) {
+        const isSelected = selectedSeats.includes(changedSeatId);
+        seatBtn.classList.toggle('selected', isSelected);
+        seatBtn.setAttribute('aria-pressed', isSelected.toString());
     }
-
-    selectedSeats.push(seatId);
-    selectedSeats.sort((a, b) => {
-        const rowA = parseInt(a, 10);
-        const rowB = parseInt(b, 10);
-        if (rowA === rowB) return a.localeCompare(b);
-        return rowA - rowB;
-    });
-    renderSeatSelectionModal();
+    
+    // Update selected seats preview (lightweight innerHTML)
+    const selectedPreview = document.getElementById('selectedSeatsPreview');
+    if (selectedPreview) {
+        if (!selectedSeats.length) {
+            selectedPreview.textContent = 'No seats selected yet';
+        } else {
+            selectedPreview.innerHTML = selectedSeats
+                .map(id => `<span class="selected-seat-chip">${id}</span>`)
+                .join('');
+        }
+    }
+    
+    // Update booking summary
+    updateBookingSummary(flight, travellers, selectedSeats, layout);
+    
+    // Update confirm button
+    const confirmButton = document.getElementById('confirmSeatReservation');
+    if (confirmButton) {
+        confirmButton.disabled = selectedSeats.length !== travellers;
+        confirmButton.innerHTML = selectedSeats.length === travellers
+            ? `Reserve ${selectedSeats.length} Seat${selectedSeats.length > 1 ? 's' : ''} &rarr;`
+            : `Select ${travellers - selectedSeats.length} More Seat${travellers - selectedSeats.length === 1 ? '' : 's'}`;
+    }
 }
 
 function confirmSeatReservation() {
